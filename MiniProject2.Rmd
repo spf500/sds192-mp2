@@ -1,0 +1,46 @@
+---
+title: "MP2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+load("house_elections.rda")
+load("candidates.rda")
+load("committees.rda")
+load("contributions.rda")
+```
+
+```{r}
+contributions_filtered <- contributions %>%
+  select(cmte_id, amndt_ind, transaction_type, entity_type, name, city, state, zip_code, transaction_amt, cand_id)
+```
+
+```{r}
+candidates_filtered <- candidates %>%
+  select(cand_id, cand_party_affiliation)
+```
+
+```{r}
+donations_by_party <- contributions_filtered %>%
+  left_join(candidates_filtered, by = "cand_id")
+```
+
+```{r}
+donation_locations <- donations_by_party %>%
+  group_by(state) %>%
+  summarize(total_contributions = sum(transaction_amt))
+```
+
+```{r}
+donation_locations %>%
+  ggplot(aes(x = state, y = total_contributions)) +
+  geom_point() 
+```
