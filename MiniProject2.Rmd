@@ -35,4 +35,10 @@ donations_by_party <- contributions_filtered %>%
   select(cmte_id, entity_type, zip_code, transaction_amt, cand_party_affiliation)
 ```
 
+```{r}
+donation_locations <- donations_by_party %>%
+  group_by(zip_code, cand_party_affiliation) %>%
+  summarise(sum(transaction_amt))
+
+```
 
