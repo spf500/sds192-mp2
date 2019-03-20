@@ -20,7 +20,8 @@ load("contributions.rda")
 
 ```{r}
 contributions_filtered <- contributions %>%
-  select(cmte_id, amndt_ind, transaction_type, entity_type, name, city, state, zip_code, transaction_amt, cand_id)
+  select(cmte_id, amndt_ind, transaction_type, entity_type, name, city, state, zip_code, transaction_amt, cand_id) %>%
+  filter(transaction_type != "24A")
 ```
 
 ```{r}
@@ -30,17 +31,8 @@ candidates_filtered <- candidates %>%
 
 ```{r}
 donations_by_party <- contributions_filtered %>%
-  left_join(candidates_filtered, by = "cand_id")
+  left_join(candidates_filtered, by = "cand_id") %>%
+  select(cmte_id, entity_type, zip_code, transaction_amt, cand_party_affiliation)
 ```
 
-```{r}
-donation_locations <- donations_by_party %>%
-  group_by(state) %>%
-  summarize(total_contributions = sum(transaction_amt))
-```
 
-```{r}
-donation_locations %>%
-  ggplot(aes(x = state, y = total_contributions)) +
-  geom_point() 
-```
