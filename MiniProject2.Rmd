@@ -38,7 +38,8 @@ donations_by_party <- contributions_filtered %>%
 ```{r}
 donation_locations <- donations_by_party %>%
   group_by(zip_code, cand_party_affiliation) %>%
-  summarise(sum(transaction_amt))
+  summarise(total = sum(transaction_amt))%>%
+  spread(key = cand_party_affiliation, value = total)
 
 ```
 
