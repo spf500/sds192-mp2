@@ -9,4 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+<<<<<<< HEAD
 hey there! this is a thing?
+=======
+hey there!
+
+got it working!
+>>>>>>> 01bf0bc3e9dde9940f43e96c5f55939cf8f3e9e2
