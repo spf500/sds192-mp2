@@ -32,12 +32,12 @@ candidates_filtered <- candidates %>%
 ```{r}
 donations_by_party <- contributions_filtered %>%
   left_join(candidates_filtered, by = "cand_id") %>%
-  select(cmte_id, entity_type, zip_code, transaction_amt, cand_party_affiliation)
+  select(cmte_id, entity_type, zip_code, transaction_amt, cand_party_affiliation, city)
 ```
 
 ```{r}
 donation_locations <- donations_by_party %>%
-  group_by(zip_code, cand_party_affiliation) %>%
+  group_by(zip_code, cand_party_affiliation, city) %>%
   summarise(total = sum(transaction_amt))
 ```
 
@@ -48,6 +48,9 @@ donation_locations %>%
   filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
   ggplot(aes(x = cand_party_affiliation, y = total))+
   geom_col()+
-  facet_wrap(~zip_code, nrow = 3)
+  facet_wrap(~zip_code, nrow = 3)+
+  xlab("Party Money Used For")+
+  ylab("Total Amount Given")+
+  ggtitle("Biggest Donors by Zip Code")
 ```
 
