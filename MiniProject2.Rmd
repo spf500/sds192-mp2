@@ -21,7 +21,7 @@ load("contributions.rda")
 ```{r}
 contributions_filtered <- contributions %>%
   select(cmte_id, amndt_ind, transaction_type, entity_type, name, city, state, zip_code, transaction_amt, cand_id) %>%
-  filter(transaction_type != "24A")
+  filter(transaction_type != "24A", transaction_amt >= "0")
 ```
 
 ```{r}
@@ -38,8 +38,16 @@ donations_by_party <- contributions_filtered %>%
 ```{r}
 donation_locations <- donations_by_party %>%
   group_by(zip_code, cand_party_affiliation) %>%
-  summarise(total = sum(transaction_amt))%>%
-  spread(key = cand_party_affiliation, value = total)
+  summarise(total = sum(transaction_amt))
+```
 
+```{r}
+donation_locations %>%
+  arrange(desc(total))%>%
+  filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP")%>%
+  filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
+  ggplot(aes(x = cand_party_affiliation, y = total))+
+  geom_col()+
+  facet_wrap(~zip_code, nrow = 3)
 ```
 
