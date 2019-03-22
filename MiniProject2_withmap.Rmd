@@ -12,6 +12,8 @@ library(tidyverse)
 library(zipcode)
 library(purrr)
 library(ggmap)
+library(maps)
+library(lubridate)
 ```
 
 ```{r}
@@ -23,32 +25,53 @@ load("contributions.rda")
 
 ```{r}
 contributions_filtered <- contributions %>%
-  select(cmte_id, transaction_type, zip_code, transaction_amt, cand_id) %>%
+  select(transaction_type, transaction_amt, cand_id, transaction_dt) %>%
   filter(transaction_type != "24A")
 contributions_filtered
 ```
 
 ```{r}
+contributions_filtered$transaction_dt <- contributions_filtered$transaction_dt %>%
+  mdy()
+```
+
+
+
+```{r}
 candidates_filtered <- candidates %>%
-  select(cand_id, cand_party_affiliation)
+  select(cand_id, cand_party_affiliation)%>%
+  filter(cand_party_affiliation == "REP"| cand_party_affiliation == "DEM")
 candidates_filtered
 ```
 
 ```{r}
 donations_by_party <- contributions_filtered %>%
   left_join(candidates_filtered, by = "cand_id") %>%
-  select(cmte_id, zip_code, transaction_amt, cand_party_affiliation)
+  select(transaction_dt, transaction_amt, cand_party_affiliation) %>%
+  filter(cand_party_affiliation == "REP"| cand_party_affiliation == "DEM") %>%
+  mutate(year = year(transaction_dt)) %>%
+  filter(year == 2011 | year == 2012)
 donations_by_party
 ```
 
 
 ```{r}
-us<-map_data('state')
+#us<-map_data('state')
 
-ggplot(donations_by_party, aes(x = Longitude, y = Latitude)) +
-  geom_polygon(data = us, aes(x = long, y = lat, group=group),color='gray',fill = NA, alpha = .35)+
-  geom_point(aes(color = cand_party_affiliation), size = .15, alpha = .25) +
-  xlim(-125, -65) + ylim(20, 50)
+#ggplot(donations_by_party, aes()) +
+#  geom_polygon(data = us, aes(x = long, y = lat, group=group),color='gray',fill = NA, alpha = .35)+
+ # geom_point(aes(color = cand_party_affiliation), size = .15, alpha = .25) +
+ # xlim(-125, -65) + ylim(20, 50)
+```
+
+```{r}
+ggplot(donations_by_party, aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
+geom_point(alpha = 0.3) +
+scale_color_manual(values = c("#0670E2", "#F62B00")) +
+ggtitle("Month vs Amount Spent Per Party") +
+xlab("Month") +
+ylab("Amount Spent ($)") +
+labs(color = "Party")
 ```
 
 
