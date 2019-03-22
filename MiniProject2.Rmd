@@ -46,11 +46,13 @@ donation_locations %>%
   arrange(desc(total))%>%
   filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP")%>%
   filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
-  ggplot(aes(x = cand_party_affiliation, y = total))+
+  ggplot(aes(x = cand_party_affiliation, y = total, fill = cand_party_affiliation))+
   geom_col()+
+  scale_fill_manual(values = c ("#0670E2", "#F62B00"))+
   facet_wrap(~zip_code, nrow = 3)+
-  xlab("Party Money Used For")+
-  ylab("Total Amount Given")+
+  xlab("Party Money Is Associated With")+
+  ylab("Total Amount Given ($)")+
+  labs(fill = "Party")+
   ggtitle("Biggest Donors by Zip Code")
 ```
 
