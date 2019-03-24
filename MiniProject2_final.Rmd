@@ -1,6 +1,6 @@
 ---
 title: "MiniProject2_final"
-author: "Lauren Low"
+author: "Lauren Low, Nicole Lawler, and Lucy Hall"
 date: "3/24/2019"
 output:
   html_document:
@@ -13,7 +13,7 @@ library(lubridate)
 ```
 
 Load data sets
-```{r}
+```{r, message = FALSE}
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
@@ -21,7 +21,7 @@ load("contributions.rda")
 ```
 
 Create a table that will display transaction type, transaction amount, candidate's ID, transaction date, and zipcode of donator and filter out all the independent expenditures opposing the election of a candidate
-```{r}
+```{r, message = FALSE}
 contributions_filtered <- contributions %>%
   select(transaction_type, transaction_amt, cand_id, transaction_dt, zip_code) %>%
   filter(transaction_type != "24A", transaction_amt >= "0")
@@ -29,13 +29,13 @@ contributions_filtered
 ```
 
 Arrange the transaction dates in contributions_filtered so that it displays as month, day, year
-```{r}
+```{r, message = FALSE}
 contributions_filtered$transaction_dt <- contributions_filtered$transaction_dt %>%
   mdy()
 ```
 
 Create a table that will display candidate's ID and candidate's party and filter out all parties that are not democrat or republican
-```{r}
+```{r, message = FALSE}
 candidates_filtered <- candidates %>%
   select(cand_id, cand_party_affiliation)%>%
   filter(cand_party_affiliation == "REP"| cand_party_affiliation == "DEM")
@@ -43,7 +43,7 @@ candidates_filtered
 ```
 
 Create a table by left-joining candidates_filtered to contributions_filtered then make columns from zip code, transaction date, transaction amount, and candidate's party.  Filter this data so that only democratic and republican candidates are displayed. Mutate the data so that the transaction date and year are displayed and filter out all the years that are not 2011 or 2012. 
-```{r}
+```{r, message = FALSE}
 donations_by_party <- contributions_filtered %>%
   left_join(candidates_filtered, by = "cand_id") %>%
   select(zip_code, transaction_dt, transaction_amt, cand_party_affiliation) %>%
@@ -54,7 +54,7 @@ donations_by_party
 ```
 
 Create a table that will show the zip code of a dontation, which party that donor gave to, and the total that donor gave.
-```{r}
+```{r, message = FALSE}
 donation_locations <- donations_by_party %>%
   group_by(zip_code, cand_party_affiliation) %>%
   summarise(total = sum(transaction_amt))
@@ -62,7 +62,7 @@ donation_locations
 ```
 
 Create a scatterplot that shows the transaction date on the x axis and the amount spent per donor on the y axis. Map color to political party.
-```{r}
+```{r, message = FALSE}
 ggplot(donations_by_party, aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
 geom_point(alpha = 0.3) +
 scale_color_manual(values = c("#0670E2", "#F62B00")) +
@@ -73,7 +73,7 @@ labs(color = "Party")
 ```
 
 Create a facetted bar graph that shows the amount of money given to each political party for the top 15 donating zip codes.  Map color to political party and facet wrap by zip code.
-```{r}
+```{r, message = FALSE}
 donation_locations %>%
   arrange(desc(total))%>%
   filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP")%>%
