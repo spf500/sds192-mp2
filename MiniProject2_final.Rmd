@@ -79,13 +79,22 @@ labs(color = "Party")
 
 For this graphic, our group was interested in the relationship between transaction amount and the date (specifically the month) that the transaction was made. Our scatter plot indicated that from January 2011 to January 2012, the transaction amount gathered (either for or against the Democratic and Republican parties) is fairly equal. However, in the months following January 2012, we noted a slight spike in transaction amount for the Republican party reaching amounts of up to 2 million. The transaction amount spikes once again, dramatically, for the Republican party in August 2012 reaching amounts upwards of 8 million. The transaction amount for the Democrats follows suit, hitting the 6 million mark. Our group concluded that this dramatic rise in transactions is likely the result of money spent not only towards but also against party affiliates. Additionally, this spike in donations likely corresponds with FEC fundraising deadlines. Overall, the data shows that the net transactions accumulated for the Republican party exceeds the net transactions accumulated for the Democratic party. For future research, it would be interesting to filter out for transactions spent in opposition of party candidates. 
 
+```{r, message = FALSE}
+top_fifteen <- function(n = 15) {
+  donations_by_party %>%
+  filter(zip_code > 0)%>%
+  group_by(zip_code, cand_party_affiliation) %>%
+  summarise(total = sum(transaction_amt)) %>%
+  arrange(desc(total))%>%
+  head(n)
+}
+```
 
 *Create a facetted bar graph that shows the amount of money given to each political party for the top 15 donating zip codes.  Map color to political party and facet wrap by zip code.*
-```{r, message = FALSE}
-donation_locations %>%
-  arrange(desc(total))%>%
-  filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP")%>%
-  filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
+
+
+```{r, message= FALSE}
+top_fifteen() %>%
   ggplot(aes(x = cand_party_affiliation, y = total, fill = cand_party_affiliation))+
   geom_col()+
   scale_fill_manual(values = c ("#0670E2", "#F62B00"))+
@@ -99,13 +108,12 @@ donation_locations %>%
 The second graphic looks at which zip codes donated the highest amount of money to a single party, specifically the top 15. (Redundancies were removed.) Some of these results seemed pretty obvious- (NUMBER) were D.C. area zip codes, which makes sense. On the other hand, one of the top ten contributors is Beverly, MA, which is not a city often talked about in politics. Another oddity was that Alexandria, VA, a liberal area, was one of the top contributors to the Republican party. Possible explanations for this include that Alexandria contributed a lot of money towards opposing republican candidates, or that a major republican PAC is located there.
 
 ```{r, message = FALSE}
-donations_by_party %>%
-  filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
+top_fifteen() %>%
 ggplot(aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
 geom_point(alpha = 0.3) +
 facet_wrap(~zip_code, nrow = 3)+
 scale_color_manual(values = c("#0670E2", "#F62B00")) +
-ggtitle("Month vs Amount Spent Per Party") +
+ggtitle("Amount Spent Per Party Per Location Over Time") +
 xlab("Month") +
 ylab("Amount Spent ($)") +
 labs(color = "Party")
