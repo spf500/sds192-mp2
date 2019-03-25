@@ -88,27 +88,17 @@ top_fifteen <- function(n = 15) {
   arrange(desc(total))%>%
   head(n)
 }
+top_fifteen()
 ```
 
 *Create a facetted bar graph that shows the amount of money given to each political party for the top 15 donating zip codes.  Map color to political party and facet wrap by zip code.*
 
 
-```{r, message= FALSE}
-top_fifteen() %>%
-  ggplot(aes(x = cand_party_affiliation, y = total, fill = cand_party_affiliation))+
-  geom_col()+
-  scale_fill_manual(values = c ("#0670E2", "#F62B00"))+
-  facet_wrap(~zip_code, nrow = 3)+
-  xlab("Party Money Is Associated With")+
-  ylab("Total Amount Given ($)")+
-  labs(fill = "Party")+
-  ggtitle("Biggest Donors by Zip Code")
-```
-
 The second graphic looks at which zip codes donated the highest amount of money to a single party, specifically the top 15. (Redundancies were removed.) Some of these results seemed pretty obvious- (NUMBER) were D.C. area zip codes, which makes sense. On the other hand, one of the top ten contributors is Beverly, MA, which is not a city often talked about in politics. Another oddity was that Alexandria, VA, a liberal area, was one of the top contributors to the Republican party. Possible explanations for this include that Alexandria contributed a lot of money towards opposing republican candidates, or that a major republican PAC is located there.
 
 ```{r, message = FALSE}
-top_fifteen() %>%
+donations_by_party %>%
+  filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
 ggplot(aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
 geom_point(alpha = 0.3) +
 facet_wrap(~zip_code, nrow = 3)+
