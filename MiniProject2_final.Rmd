@@ -1,18 +1,23 @@
 ---
-title: "MiniProject2_final"
+title: "Mini Project 2"
 author: "Lauren Low, Nicole Lawler, and Lucy Hall"
 date: "3/24/2019"
 output:
   html_document:
     code_folding: hide
 ---
-Load packages
+*Load packages*
 ```{r, message = FALSE}
 library(tidyverse)
 library(lubridate)
 ```
 
-Load data sets
+For mini-project 2 [^1], our group decided to look at the transaction amount accumulated in total (accounting for money also donated in opposition) for a given party in the 2012 election cycle. We were interested in where and when the money was being contributed.
+
+
+[^1]: Github repository: https://github.com/spf500/sds192-mp2
+
+*Load data sets*
 ```{r, message = FALSE}
 load("house_elections.rda")
 load("candidates.rda")
@@ -20,7 +25,7 @@ load("committees.rda")
 load("contributions.rda")
 ```
 
-Create a table that will display transaction type, transaction amount, candidate's ID, transaction date, and zipcode of donator and filter out all the independent expenditures opposing the election of a candidate
+*Create a table that will display transaction type, transaction amount, candidate's ID, transaction date, and zipcode of donator and filter out all the independent expenditures opposing the election of a candidate*
 ```{r, message = FALSE}
 contributions_filtered <- contributions %>%
   select(transaction_type, transaction_amt, cand_id, transaction_dt, zip_code) %>%
@@ -28,13 +33,13 @@ contributions_filtered <- contributions %>%
 contributions_filtered
 ```
 
-Arrange the transaction dates in contributions_filtered so that it displays as month, day, year
+*Arrange the transaction dates in contributions_filtered so that it displays as month, day, year*
 ```{r, message = FALSE}
 contributions_filtered$transaction_dt <- contributions_filtered$transaction_dt %>%
   mdy()
 ```
 
-Create a table that will display candidate's ID and candidate's party and filter out all parties that are not democrat or republican
+*Create a table that will display candidate's ID and candidate's party and filter out all parties that are not democrat or republican*
 ```{r, message = FALSE}
 candidates_filtered <- candidates %>%
   select(cand_id, cand_party_affiliation)%>%
@@ -42,7 +47,7 @@ candidates_filtered <- candidates %>%
 candidates_filtered
 ```
 
-Create a table by left-joining candidates_filtered to contributions_filtered then make columns from zip code, transaction date, transaction amount, and candidate's party.  Filter this data so that only democratic and republican candidates are displayed. Mutate the data so that the transaction date and year are displayed and filter out all the years that are not 2011 or 2012. 
+*Create a table by left-joining candidates_filtered to contributions_filtered then make columns from zip code, transaction date, transaction amount, and candidate's party.  Filter this data so that only democratic and republican candidates are displayed. Mutate the data so that the transaction date and year are displayed and filter out all the years that are not 2011 or 2012.* 
 ```{r, message = FALSE}
 donations_by_party <- contributions_filtered %>%
   left_join(candidates_filtered, by = "cand_id") %>%
@@ -53,7 +58,7 @@ donations_by_party <- contributions_filtered %>%
 donations_by_party
 ```
 
-Create a table that will show the zip code of a dontation, which party that donor gave to, and the total that donor gave.
+*Create a table that will show the zip code of a dontation, which party that donor gave to, and the total that donor gave.*
 ```{r, message = FALSE}
 donation_locations <- donations_by_party %>%
   group_by(zip_code, cand_party_affiliation) %>%
@@ -61,7 +66,7 @@ donation_locations <- donations_by_party %>%
 donation_locations
 ```
 
-Create a scatterplot that shows the transaction date on the x axis and the amount spent per donor on the y axis. Map color to political party.
+*Create a scatterplot that shows the transaction date on the x axis and the amount spent per donor on the y axis. Map color to political party.*
 ```{r, message = FALSE}
 ggplot(donations_by_party, aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
 geom_point(alpha = 0.3) +
@@ -72,7 +77,10 @@ ylab("Amount Spent ($)") +
 labs(color = "Party")
 ```
 
-Create a facetted bar graph that shows the amount of money given to each political party for the top 15 donating zip codes.  Map color to political party and facet wrap by zip code.
+For this graphic, our group was interested in the relationship between transaction amount and the date (specifically the month) that the transaction was made. Our scatter plot indicated that from January 2011 to January 2012, the transaction amount gathered (either for or against the Democratic and Republican parties) is fairly equal. However, in the months following January 2012, we noted a slight spike in transaction amount for the Republican party reaching amounts of up to 2 million. The transaction amount spikes once again, dramatically, for the Republican party in August 2012 reaching amounts upwards of 8 million. The transaction amount for the Democrats follows suit, hitting the 6 million mark. Our group concluded that this dramatic rise in transactions is likely the result of money spent not only towards but also against party affiliates. Additionally, this spike in donations likely corresponds with FEC fundraising deadlines. Overall, the data shows that the net transactions accumulated for the Republican party exceeds the net transactions accumulated for the Democratic party. For future research, it would be interesting to filter out for transactions spent in opposition of party candidates. 
+
+
+*Create a facetted bar graph that shows the amount of money given to each political party for the top 15 donating zip codes.  Map color to political party and facet wrap by zip code.*
 ```{r, message = FALSE}
 donation_locations %>%
   arrange(desc(total))%>%
@@ -88,9 +96,18 @@ donation_locations %>%
   ggtitle("Biggest Donors by Zip Code")
 ```
 
-For mini-project 2, our group decided to look at the transaction amount accumulated in total (accounting for money also donated in opposition) for a given party in the 2012 election cycle. We were interested in where and when the money was being contributed.
-
-For this graphic, our group was interested in the relationship between transaction amount and the date (specifically the month) that the transaction was made. Our scatter plot indicated that from January 2011 to January 2012, the transaction amount gathered (either for or against the Democratic and Republican parties) is fairly equal. However, in the months following January 2012, we noted a slight spike in transaction amount for the Republican party reaching amounts of up to 2 million. The transaction amount spikes once again, dramatically, for the Republican party in August 2012 reaching amounts upwards of 8 million. The transaction amount for the Democrats follows suit, hitting the 6 million mark. Our group concluded that this dramatic rise in transactions is likely the result of money spent not only towards but also against party affiliates. Additionally, this spike in donations likely corresponds with FEC fundraising deadlines. Overall, the data shows that the net transactions accumulated for the Republican party exceeds the net transactions accumulated for the Democratic party. For future research, it would be interesting to filter out for transactions spent in opposition of party candidates. 
-
 The second graphic looks at which zip codes donated the highest amount of money to a single party, specifically the top 15. (Redundancies were removed.) Some of these results seemed pretty obvious- (NUMBER) were D.C. area zip codes, which makes sense. On the other hand, one of the top ten contributors is Beverly, MA, which is not a city often talked about in politics. Another oddity was that Alexandria, VA, a liberal area, was one of the top contributors to the Republican party. Possible explanations for this include that Alexandria contributed a lot of money towards opposing republican candidates, or that a major republican PAC is located there.
+
+```{r, message = FALSE}
+donations_by_party %>%
+  filter(zip_code == "22314" | zip_code == "21286" | zip_code == "20036" | zip_code == "20007" | zip_code == "01915" | zip_code == "20002" | zip_code == "20003" | zip_code == "91403" |zip_code == "85024" | zip_code == "20005"| zip_code == "70817" | zip_code == "20814" | zip_code == "92592"| zip_code == "94043" | zip_code == "20006") %>%
+ggplot(aes(x = transaction_dt, y = transaction_amt, color = cand_party_affiliation)) +
+geom_point(alpha = 0.3) +
+facet_wrap(~zip_code, nrow = 3)+
+scale_color_manual(values = c("#0670E2", "#F62B00")) +
+ggtitle("Month vs Amount Spent Per Party") +
+xlab("Month") +
+ylab("Amount Spent ($)") +
+labs(color = "Party")
+```
 
